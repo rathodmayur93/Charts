@@ -529,18 +529,13 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
     private var _decelerationDisplayLink: NSUIDisplayLink!
     private var _decelerationVelocity = CGPoint()
     
-    @objc private func tapGestureRecognized(_ recognizer: NSUITapGestureRecognizer)
-    {
-        if data === nil
-        {
-            return
-        }
-        
-        if recognizer.state == NSUIGestureRecognizerState.ended
-        {
+    open override func nsuiTouchesBegan(_ touches: Set<NSUITouch>, withEvent event: NSUIEvent?) {
+        if let touch = touches.first {
+            let location = touch.location(in: self)
+            
             if !isHighLightPerTapEnabled { return }
             
-            let h = getHighlightByTouchPoint(recognizer.location(in: self))
+            let h = getHighlightByTouchPoint(touch.location(in: self))
             
             if h === nil || h == self.lastHighlighted
             {
@@ -552,6 +547,36 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
                 lastHighlighted = h
                 highlightValue(h, callDelegate: true)
             }
+            
+            delegate?.chartViewTouchDidBegan?(location)
+        }
+    }
+    
+    @objc private func tapGestureRecognized(_ recognizer: NSUITapGestureRecognizer)
+    {
+        if data === nil
+        {
+            return
+        }
+        
+        if recognizer.state == NSUIGestureRecognizerState.ended
+        {
+//            if !isHighLightPerTapEnabled { return }
+//
+//            let h = getHighlightByTouchPoint(recognizer.location(in: self))
+//
+//            if h === nil || h == self.lastHighlighted
+//            {
+//                lastHighlighted = nil
+//                highlightValue(nil, callDelegate: true)
+//            }
+//            else
+//            {
+//                lastHighlighted = h
+//                highlightValue(h, callDelegate: true)
+//            }
+            
+            delegate?.chartViewTapDidEnd?(self)
         }
     }
     
